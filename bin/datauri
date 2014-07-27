@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Nicolas Gallagher (@necolas)
+#
+# Description:
+#   Create a data URI from a file and copy it to the pasteboard
+#
+# Dependencies:
+#   pbcopy
+#
+# Configuration:
+#   @params   file    an image file (could be any file) to convert
+#
+# Usage:
+#   `datauri filename.jpg`
+
+_datauri() {
+	local mimeType=$(file -b --mime-type "$1")
+	local usage="$(basename "$0"): usage: $(basename "$0") $(tput smul)file$(tput rmul)"
+
+	# Test for known flags
+	for opt in $@
+	do
+		case $opt in
+			-h|--help)
+				printf '%s\n' "$usage"
+				exit 2
+				;;
+			-*|--*) 
+				printf '%sbash: %s: %s: invalid option\n' "-" "$(basename "$0")" "$opt" >&2
+				printf '%s\n' "$usage"
+				exit 1
+				;;
+		esac
+	done
+
+	if [[ ! -f $1 ]]; then
+		printf 'bash: %s: No file found\n' "$(basename "$0")" >&2
+		exit 1
+	fi
+
+	if [[ $mimeType == text/* ]]; then
+		mimeType="${mimeType};charset=utf-8"
+	fi
+	printf "data:%s;base64,%s"  "${mimeType}" "$(openssl base64 -in "$1" | tr -d '\n')" | pbcopy
+}
+
+_datauri "$1"

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Ben Alman (@cowboy)
+#
+# Description:
+#   Print out current WiFi network's SSID
+#
+# Dependencies:
+#   None
+#
+# Usage:
+#   `ssid`
+
+_ssid() {
+	local usage="$(basename "$0"): usage: $(basename "$0")"
+	local ssid=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/Resources/airport -I | grep " SSID" | sed "s/.*: //")
+	local opt
+
+	# Test for known flags
+	for opt in $@
+	do
+		case $opt in
+			-h|--help)
+				printf '%s\n' "$usage"
+				exit 2
+				;;
+			-*|--*) 
+				printf '%sbash: %s: %s: invalid option\n' "-" "$(basename "$0")" "$opt" >&2
+				printf '%s\n' "$usage"
+				exit 1
+				;;
+		esac
+	done
+
+	if [ "$1" ]; then
+		if [ "$(echo $ssid | grep -w $1)" ]; then
+			echo $1
+		fi
+	else
+		echo $ssid
+	fi
+}
+
+_ssid "$@"

@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Ben Alman (@cowboy)
+#
+# Description:
+#   Resample specified images to 72 DPI
+#   The new MacBook Pro retina display is amazing, but screengrabs taken on
+#   one using the screencapture utility aren't scaled to 72 DPI by default.
+#   This script scales those images to 72 DPI, making them viewable at a sane
+#   resolution in web browsers.
+#
+# Dependencies:
+#   None
+#
+# Usage:
+#   `resample-dpi example.jpg`
+
+_resample-dpi() {
+	local usage="$(basename "$0"): usage: $(basename "$0") [img [img ...]]"
+	local opt
+	local file="$1"
+
+	# Test for known flags
+	for opt in $@
+	do
+		case $opt in
+			-h|--help)
+				printf '%s\n' "$usage"
+				exit 2
+				;;
+			-H|--height) height=true ;;
+			-w|--width) width=true ;;
+			-*|--*) 
+				printf '%sbash: %s: %s: Invalid option\n' "-" "$(basename "$0")" "$opt" >&2
+				printf '%s\n' "$usage"
+				exit 1
+				;;
+		esac
+	done
+
+	if [[ ! "${file}" ]]; then 
+		printf "bash: %s: No pattern specified\n" "$(basename "$0")"
+		exit 1; 
+	fi
+
+	if [[ ! -f "${file}" ]]; then 
+		printf "bash: %s: No such file\n" "$(basename "$0")"
+		exit 1; 
+	fi
+
+	while [[ "$1" ]]; do
+		file="$1"; shift
+
+		dpiWidth=$(sips "$file" -g dpiWidth | awk '/:/ {print $2}')
+		dpiHeight=$(sips "$file" -g dpiHeight | awk '/:/ {print $2}')
+		pixelWidth=$(sips "$file" -g pixelWidth | awk '/:/ {print $2}')
+		pixelHeight=$(sips "$file" -g pixelHeight | awk '/:/ {print $2}')
+
+		if [[ "$(echo "$dpiWidth - 72" | bc)" == "0" || "$(echo "$dpiHeight - 72" | bc)" == "0" ]]; then
+			echo "File $(basename "$file") already ${pixelWidth}x${pixelHeight} pixels @ 72 DPI."
+			continue
+		fi
+
+		w=$(echo "$pixelWidth * 72 / $dpiWidth" | bc)
+		h=$(echo "$pixelHeight * 72 / $dpiHeight" | bc)
+
+		echo "Resampling $(basename "$file") to ${w}x${h} pixels @ 72 DPI."
+		sips "$file" -s dpiWidth 72 -s dpiHeight 72 -z $h $w >/dev/null 2>&1
+	done
+}
+
+_resample-dpi "$@"
