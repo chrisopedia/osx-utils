@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Newton Koumantzelis (@chrisohpedia)
+#
+# Description:
+#   Quicklook any file
+#
+# Configuration:
+#   @params   file    an file (could be any file) to quicklook
+#
+# Usage:
+#   `quicklook filename.jpg`
+
+_quicklook() {
+	local file="$1"
+	local usage="$(basename "$0"): usage: $(basename "$0") $(tput smul)file$(tput rmul)"
+	local opt
+
+	# Test for known flags
+	for opt in "$@"
+	do
+		case $opt in
+			-h|--help)
+				printf '%s\n' "$usage"
+				exit 2
+				;;
+			-*|--*)
+				printf '%sbash: %s: %s: invalid option\n' "-" "$(basename "$0")" "$opt" >&2
+				printf '%s\n' "$usage"
+				exit 1
+				;;
+		esac
+	done
+
+	if [[ ! -f "${file}" ]]; then
+		printf 'bash: %s: No file found\n' "$(basename "$0")" >&2
+		exit 1
+	fi
+
+	qlmanage -p "${file}"
+}
+
+_quicklook "$1"
