@@ -18,16 +18,17 @@
 _datauri() {
 	local mimeType=$(file -b --mime-type "$1")
 	local usage="$(basename "$0"): usage: $(basename "$0") $(tput smul)file$(tput rmul)"
+	local opt
 
 	# Test for known flags
-	for opt in $@
+	for opt in "$@"
 	do
 		case $opt in
 			-h|--help)
 				printf '%s\n' "$usage"
 				exit 2
 				;;
-			-*|--*) 
+			-*|--*)
 				printf '%sbash: %s: %s: invalid option\n' "-" "$(basename "$0")" "$opt" >&2
 				printf '%s\n' "$usage"
 				exit 1
