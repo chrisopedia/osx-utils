@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# Author:
+#   Sindre Sorhus (@sindresorhus)
+#
+# Description:
+#   Copy/change to the path for the current/active Finder window
+#
+# Dependencies:
+#   None
+#
+# Usage:
+#   `copy-finder-path`
+
+_finder-path() {
+	local usage="$(basename "$0"): usage: $(basename "$0") [cd|cp]"
+	local cmd="$1"
+	local opt
+
+	# Test for known flags
+	for opt in "$@"
+	do
+		case $opt in
+			-h|--help)
+				printf '%s\n' "$usage"
+				exit 2
+				;;
+			-*|--*) 
+				printf '%sbash: %s: %s: invalid option\n' "-" "$(basename "$0")" "$opt" >&2
+				printf '%s\n' "$usage"
+				exit 1
+				;;
+		esac
+	done
+
+	case $cmd in
+		cd)
+			cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')" || exit
+			;;
+		cp)
+			osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)' | pbcopy
+			;;
+		-*|--*) 
+			printf '%sbash: %s: %s: invalid argument\n' "-" "$(basename "$0")" "$opt" >&2
+			printf '%s\n' "$usage"
+			exit 1
+			;;
+	esac
+
+}
+
+_finder-path "$@"
