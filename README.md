@@ -1,15 +1,11 @@
 # osx-utils
 
-Just a lot of OS X functions and scripts I've created and collected over the years.
-
-[![Version 1.0.0](http://img.shields.io/badge/version-1.0.0-brightgreen.svg)](https://github.com/chrisopedia/osx-utils/releases/tag/1.0.0) [![Stories in Ready](https://badge.waffle.io/chrisopedia/osx-utils.png?label=Ready)](http://waffle.io/chrisopedia/osx-utils)
-
-For the most part, there shouldn't be any dependencies, but each script will have a place at the top that discusses the dependency.
+A lot of OS X functions and scripts I've created and collected over the years.
 
 ## One-line Install
 
 ```bash
-$ bash -c "$(curl -#fL raw.github.com/chrisopedia/osx-utils/go/install)"
+$ bash -c "$(curl -#fL raw.github.com/iamnewton/osx-utils/go/install)"
 ```
 
 ## Features
