@@ -1,4 +1,4 @@
-# osx-utils
+# OS X Utilities
 
 A lot of OS X functions and scripts I've created and collected over the years.
 
